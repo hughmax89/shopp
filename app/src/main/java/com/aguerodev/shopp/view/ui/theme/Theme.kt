@@ -1,4 +1,4 @@
-package com.aguerodev.shopp.view.theme
+package com.aguerodev.shopp.view.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
