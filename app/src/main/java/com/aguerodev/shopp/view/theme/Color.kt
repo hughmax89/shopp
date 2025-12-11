@@ -1,4 +1,4 @@
-package com.aguerodev.shopp.ui.theme
+package com.aguerodev.shopp.view.theme
 
 import androidx.compose.ui.graphics.Color
 
