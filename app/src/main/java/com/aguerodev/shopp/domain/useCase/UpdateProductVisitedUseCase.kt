@@ -5,7 +5,7 @@ import com.aguerodev.shopp.domain.repository.Repository
 import jakarta.inject.Inject
 
 class UpdateProductVisitedUseCase @Inject constructor(val repository: Repository) {
-    suspend operator fun invoke(id){
+    suspend operator fun invoke(id: Int){
         return repository.updateProductVisit(id)
     }
 }
