@@ -8,5 +8,6 @@ data class Product(
     val categoryName: String,
     val imageUrl: String?,
     val rating: Double?,
-    val ratingCount: Int?
+    val ratingCount: Int?,
+    val visited: Boolean
 )

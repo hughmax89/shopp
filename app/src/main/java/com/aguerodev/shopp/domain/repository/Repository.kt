@@ -7,6 +7,6 @@ interface Repository{
     suspend fun getProduct(id: Int): Product
     suspend fun getProductList(user: User): List<Product>
     suspend fun getHistoryProductList(): List<Product>
-    suspend fun putProductVisit(product: Product)
+    suspend fun updateProductVisit(id: Int)
     suspend fun deleteHistoryProduct()
 }

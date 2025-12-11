@@ -1,0 +1,91 @@
+package com.aguerodev.shopp.data.di
+
+import android.content.Context
+import androidx.room.Room
+import com.aguerodev.shopp.data.datasource.database.AppDataBase
+import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryA
+import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryB
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Qualifier
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataModule {
+    private const val SHOPP_DB = "shopp_db"
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class CountryAApi
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class CountryBApi
+
+    @Singleton
+    @CountryAApi
+    @Provides
+    fun provideShoppClientCountryA(
+        @CountryAApi retrofit: Retrofit
+    ): ShoppClientCountryA {
+        return retrofit.create(ShoppClientCountryA::class.java)
+    }
+
+    @Singleton
+    @CountryBApi
+    @Provides
+    fun provideShoppClientCountryB(
+        @CountryBApi retrofit: Retrofit
+    ): ShoppClientCountryB {
+        return retrofit.create(ShoppClientCountryB::class.java)
+    }
+
+
+    @Singleton
+    @CountryAApi
+    @Provides
+    fun provideRetrofitCountryA(json: Json): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://fakestoreapi.com/")
+            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
+            .build()
+    }
+
+    @Singleton
+    @CountryBApi
+    @Provides
+    fun provideRetrofitCountryB(json: Json): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://fakeapi.platzi.com/")
+            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
+            .build()
+    }
+
+
+    @Provides
+    fun provideJson(): Json{
+        return Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideRoom(@ApplicationContext context: Context) = Room.databaseBuilder(
+        context,
+        AppDataBase::class.java,
+        SHOPP_DB
+    )
+
+    @Provides
+    @Singleton
+    fun provideShoppDao(database: AppDataBase) = database.shoppDao()
+}
