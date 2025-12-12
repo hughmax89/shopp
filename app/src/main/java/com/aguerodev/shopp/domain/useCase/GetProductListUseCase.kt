@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 class GetProductListUseCase @Inject constructor(val repository: Repository) {
     suspend operator fun invoke(user: User): List<Product>{
-        return repository.getProductList()
+        return repository.getProductList(user)
     }
 }

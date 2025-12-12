@@ -21,9 +21,10 @@ interface ShoppDao {
     @Query("SELECT * FROM product_table WHERE visited = 1")
     suspend fun getAllHistoryProducts(): List<ProductEntity>
 
-    @Query("UPDATE product_table SET visited = :1 WHERE id = :id")
+    @Query("UPDATE product_table SET visited = 1 WHERE id = :id")
     suspend fun updateProductVisited(id: Int)
 
-    @Query("SELECT * FROM product_table")
+    @Query("DELETE FROM product_table")
     suspend fun deleteAllHistoryProducts()
+
 }

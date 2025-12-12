@@ -11,8 +11,8 @@ import com.aguerodev.shopp.domain.repository.Repository
 import javax.inject.Inject
 
 class RepositoryImplementation @Inject constructor(
-    @DataModule.CountryAApi private val shoppClientCountryA: ShoppClientCountryA,
-    @DataModule.CountryBApi private val shoppClientCountryB: ShoppClientCountryB,
+    private val shoppClientCountryA: ShoppClientCountryA,
+//    @DataModule.CountryBApi private val shoppClientCountryB: ShoppClientCountryB,
     private val appDataBase: AppDataBase
 ) : Repository {
         override suspend fun getProduct(id: Int): Product {
@@ -20,11 +20,11 @@ class RepositoryImplementation @Inject constructor(
         }
 
     override suspend fun getProductList(userCountry: User): List<Product> {
-
-        val productList = when (userCountry) {
-            User.COUNTRY_A -> shoppClientCountryA.getProductListCountryA()
-            User.COUNTRY_B -> shoppClientCountryB.getProductListCountryB()
-        }
+        val productList = shoppClientCountryA.getProductListCountryA()
+//        val productList = when (userCountry) {
+//            User.COUNTRY_A -> shoppClientCountryA.getProductListCountryA()
+//            User.COUNTRY_B -> shoppClientCountryB.getProductListCountryB()
+//        }
         appDataBase.shoppDao().insertProducts(productList)
 
         return appDataBase.shoppDao().getProducts().map { it.toDomain() }
