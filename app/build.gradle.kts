@@ -57,7 +57,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     //NAV
     implementation(libs.androidx.navigation.compose)
@@ -65,6 +65,8 @@ dependencies {
     //HILT
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.appcompat)
     ksp(libs.hilt.compiler)
 
     //RETROFIT
@@ -84,5 +86,15 @@ dependencies {
     implementation(libs.room)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    // DataStore Preferences
+    implementation(libs.datastore.preferences)
+
+    // Firebase (BOM)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+
+    // Biometric
+    implementation(libs.biometric.ktx)
 
 }

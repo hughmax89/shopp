@@ -6,22 +6,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aguerodev.shopp.view.home.HomeScreen
 import com.aguerodev.shopp.view.login.LoginScreen
+import com.aguerodev.shopp.view.login.LoginViewModel
 import com.aguerodev.shopp.view.splash.SplashScreen
 
+
 @Composable
-fun NavigationWrapper(modifier: Modifier) {
+fun NavigationWrapper(
+    modifier: Modifier,
+    onBiometricLogin: ((onSuccess: () -> Unit) -> Unit)
+) {
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
-
-    // ¿En esta ruta se debe mostrar el bottom bar?
     val showBottomBar = bottomDestinations.any { it.route == currentDestination?.route }
 
     Scaffold(
@@ -37,7 +41,7 @@ fun NavigationWrapper(modifier: Modifier) {
             modifier = modifier.padding(innerPadding)
         ) {
 
-            // 🔹 SplashScreen: primera pantalla
+            // 🔹 SplashScreen
             composable<Splash> {
                 SplashScreen(navigateToLogin = {
                     navController.navigate(Login) {
@@ -46,12 +50,25 @@ fun NavigationWrapper(modifier: Modifier) {
                 })
             }
 
+            // 🔹 LoginScreen
             composable<Login> {
+                val viewModel = hiltViewModel<LoginViewModel>()
                 LoginScreen(
+                    viewModel = viewModel,
                     onLoginSuccess = {
                         navController.navigate(BottomBar.Home.route) {
                             popUpTo(Login) {
                                 inclusive = true
+                            }
+                        }
+                    },
+                    // 2. Pasamos la función de la Activity a la LoginScreen
+                    onBiometricLoginRequest = {
+                        // Cuando la LoginScreen pide biometría,
+                        // le indicamos a la Activity cómo navegar si tiene éxito.
+                        onBiometricLogin {
+                            navController.navigate(BottomBar.Home.route) {
+                                popUpTo(Login) { inclusive = true }
                             }
                         }
                     }
@@ -75,4 +92,3 @@ fun NavigationWrapper(modifier: Modifier) {
         }
     }
 }
-
