@@ -12,6 +12,9 @@ Room -> DataBase
 Retrofit -> API
 Authentication -> Firebase
 GITHUB -> Respository
+Coil -> Image loader
+
+
 
 I use information from 2 apis:
 

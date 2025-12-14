@@ -1,33 +1,35 @@
 package com.aguerodev.shopp.data.response
 
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.aguerodev.shopp.data.datasource.database.ListConverter
 import com.aguerodev.shopp.data.datasource.database.entities.ProductEntity
 import kotlinx.serialization.Serializable
 
+
 @Serializable
-data class ProductResponseCountryA(
+data class ProductResponseA(
     val id: Int,
     val title: String,
     val price: Double,
     val description: String,
-    val category: String,
     val image: String,
-    val rating: RatingResponseCountryA
+    val category: String,
+    val rating: RatingResponse
 )
-
 @Serializable
-data class RatingResponseCountryA(
+data class RatingResponse(
     val rate: Double,
     val count: Int
 )
-
-fun ProductResponseCountryA.toEntity(): ProductEntity {
+fun ProductResponseA.toEntity(): ProductEntity {
     return ProductEntity(
         id = this.id,
         title = this.title,
-        price = this.price,
         description = this.description,
+        price = this.price,
         categoryName = this.category,
-        imageUrl = this.image,
+        imageUrls = listOf(this.image),
         rating = this.rating.rate,
         ratingCount = this.rating.count,
         visited = false

@@ -100,4 +100,9 @@ dependencies {
     // Biometric
     implementation(libs.biometric.ktx)
 
+    //COIL
+    implementation(libs.coil.compose)
+
+    // Gson (JSON)
+    implementation(libs.google.gson)
 }

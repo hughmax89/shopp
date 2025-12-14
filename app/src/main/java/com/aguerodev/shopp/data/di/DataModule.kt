@@ -26,11 +26,11 @@ object DataModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class CountryAApi
 
-//    @Qualifier
-//    @Retention(AnnotationRetention.BINARY)
-//    annotation class CountryBApi
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class CountryBApi
 
-//    @CountryAApi
+    @CountryAApi
     @Singleton
     @Provides
     fun provideShoppClientCountryA(
@@ -38,16 +38,6 @@ object DataModule {
     ): ShoppClientCountryA {
         return retrofit.create(ShoppClientCountryA::class.java)
     }
-
-//    @CountryBApi
-//    @Singleton
-//    @Provides
-//    fun provideShoppClientCountryB(
-//        @CountryBApi retrofit: Retrofit
-//    ): ShoppClientCountryB {
-//        return retrofit.create(ShoppClientCountryB::class.java)
-//    }
-
 
     @CountryAApi
     @Singleton
@@ -58,16 +48,25 @@ object DataModule {
             .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
             .build()
     }
-//    @CountryBApi
-//    @Singleton
-//    @Provides
-//    fun provideRetrofitCountryB(json: Json): Retrofit {
-//        return Retrofit.Builder()
-//            .baseUrl("https://fakeapi.platzi.com/")
-//            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
-//            .build()
-//    }
 
+    @CountryBApi
+    @Singleton
+    @Provides
+    fun provideShoppClientCountryB(
+        @CountryBApi retrofit: Retrofit
+    ): ShoppClientCountryB {
+        return retrofit.create(ShoppClientCountryB::class.java)
+    }
+
+    @CountryBApi
+    @Singleton
+    @Provides
+    fun provideRetrofitCountryB(json: Json): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.escuelajs.co/")
+            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
+            .build()
+    }
 
     @Provides
     fun provideJson(): Json{
@@ -84,8 +83,6 @@ object DataModule {
         AppDataBase::class.java,
         SHOPP_DB
     ).build()
-
-
 
     @Provides
     @Singleton
