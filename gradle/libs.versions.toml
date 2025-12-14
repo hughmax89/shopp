@@ -24,6 +24,7 @@ firebase-bom = "32.7.0"
 biometric = "1.2.0-alpha05"
 material3 = "1.4.0"
 appcompat = "1.7.1"
+googleServices = "4.4.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -58,6 +59,7 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-auth = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 biometric-ktx = { module = "androidx.biometric:biometric-ktx", version.ref = "biometric" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -71,3 +73,4 @@ kotlin-parcelize = { id = "kotlin-parcelize", version.ref = "kotlinParcelize" }
 jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = {id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 ksp = {id = "com.google.devtools.ksp", version.ref = "kspVersion"}
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

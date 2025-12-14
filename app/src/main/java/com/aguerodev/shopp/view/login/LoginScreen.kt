@@ -15,32 +15,36 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +58,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.aguerodev.shopp.domain.entity.Country
+import com.aguerodev.shopp.view.core.Resource
 import com.aguerodev.shopp.view.util.findActivity
 
 
@@ -61,14 +67,93 @@ import com.aguerodev.shopp.view.util.findActivity
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit,
-    onBiometricLoginRequest: () -> Unit
+    onBiometricLoginRequest: () -> Unit,
+    isBiometricAvailable: Boolean
 ) {
     val activity = LocalContext.current.findActivity()
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    val selectedCountryValue by viewModel.selectedCountry.collectAsState()
+    val loginState by viewModel.loginState.collectAsState()
+    val emailValue by viewModel.email.collectAsState()
+    val passwordValue by viewModel.password.collectAsState()
+    val isEmailValid by viewModel.isEmailFormatValid.collectAsState()
+    val isPasswordValid by viewModel.isPasswordLengthValid.collectAsState()
+    val validationErrorMessage by viewModel.validationError.collectAsState()
+    val isLoggingIn = loginState is Resource.Loading
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val argentinaBlue = Color(0xFF74ACDF)
+    val brazilYellow = Color(0xFFFDE747)
+    val isBrazil = selectedCountryValue == Country.COUNTRY_B
+
+    val buttonColor by animateColorAsState(
+        targetValue = if (isBrazil) brazilYellow else argentinaBlue,
+        animationSpec = tween(500), label = "ButtonColor"
+    )
+
+    val contentColor = if (isBrazil) Color.Black else Color.White
+    val loadingColor = contentColor
 
     LaunchedEffect(Unit) {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is Resource.Success -> {
+                onLoginSuccess()
+                viewModel.resetLoginState()
+            }
+            else -> Unit
+        }
+    }
+
+    if (loginState is Resource.Error) {
+        val errorState = loginState as Resource.Error
+
+        LoginErrorModal(
+            errorMessage = errorState.message ?: "Error al autenticar. Inténtelo de nuevo.",
+            onDismiss = viewModel::resetLoginState,
+            viewModel = viewModel
+        )
+    }
+
+    if (viewModel.isUserRemembered) {
+        if (isBiometricAvailable) {
+            BiometricWelcomeScreen(
+                userName = viewModel.rememberedUserName ?: "Usuario",
+                onAuthenticate = { onBiometricLoginRequest() },
+                onUseOtherAccount = { viewModel.isUserRemembered = false }
+            )
+        } else {
+            RememberedUserScreen(
+                userName = viewModel.rememberedUserName ?: "Usuario",
+                onContinue = {
+                    onLoginSuccess()
+                },
+                onUseOtherAccount = { viewModel.isUserRemembered = false }
+            )
+        }
+        // Si se muestra cualquiera de las pantallas recordadas, salimos del Composable
+        return
+    }
+
+    validationErrorMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = viewModel::clearValidationError,
+            title = {
+                Text("Error de validación ⚠️")
+            },
+            text = {
+                Text(message)
+            },
+            confirmButton = {
+                Button(
+                    onClick = viewModel::clearValidationError
+                ) {
+                    Text("Entendido")
+                }
+            }
+        )
+    }
 
     if (viewModel.isUserRemembered) {
         BiometricWelcomeScreen(
@@ -96,29 +181,40 @@ fun LoginScreen(
         )
 
         CustomTextField(
-            value = viewModel.email,
-            onValueChange = { viewModel.email = it },
-            label = "Usuario (Email)",
-            isError = !viewModel.isEmailValid && viewModel.email.isNotEmpty(),
+            value = emailValue,
+            onValueChange = viewModel::onEmailChanged,
+            label = "Usuario",
+            isError = !isEmailValid && emailValue.isNotEmpty(),
             errorMessage = "Debe ser un email válido (ej: user@mail.com)",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         Spacer(Modifier.height(16.dp))
 
         CustomTextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.password = it },
+            value = passwordValue,
+            onValueChange = viewModel::onPasswordChanged,
             label = "Contraseña",
-            isError = !viewModel.isPasswordValid && viewModel.password.isNotEmpty(),
+            isError = !isPasswordValid && passwordValue.isNotEmpty(),
             errorMessage = "Mínimo 8 caracteres",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Filled.Visibility
+                else
+                    Icons.Filled.VisibilityOff
+                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = description)
+                }
+            }
         )
         Spacer(Modifier.height(24.dp))
-
-        AnimatedCountrySelector(
-            selectedCountry = viewModel.selectedCountry,
-            onCountrySelected = { country -> viewModel.selectedCountry = country }
+        CountrySwitch(
+            currentCountry = selectedCountryValue,
+            onCountryChange = viewModel::onCountrySelectionChanged
         )
         Spacer(Modifier.height(24.dp))
 
@@ -134,24 +230,10 @@ fun LoginScreen(
                     uncheckedColor = Color.White
                 )
             )
-            Text("Recordar mi usuario y usar Biometría", color = Color.White.copy(alpha = 0.8f))
-        }
-        Spacer(Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-                keyboardController?.hide()
-                viewModel.attemptLocalLogin()
-                if (viewModel.isFormValid) {
-                    onLoginSuccess()
-                }
-            },
-            enabled = viewModel.isFormValid,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text("ACCEDER", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = if (isBiometricAvailable) "Recordar mi usuario y usar Biometría" else "Recordar usuario",
+                color = Color.White.copy(alpha = 0.8f)
+            )
         }
 
         Spacer(Modifier.height(16.dp))
@@ -159,26 +241,30 @@ fun LoginScreen(
         OutlinedButton(
             onClick = {
                 keyboardController?.hide()
-                viewModel.attemptFirebaseLogin()
-                if (viewModel.isFormValid) {
-                    onLoginSuccess()
-                }
+                // Inicia la operación de Login, que setea isLoggingIn = true (Resource.Loading)
+                viewModel.loginFirebase()
             },
+            enabled = !isLoggingIn,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            border = BorderStroke(1.dp, Color.White),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-        ) {
-            Text("Login con Firebase", fontSize = 16.sp)
-        }
 
-        viewModel.loginError?.let { message ->
-            Text(
-                text = message,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = buttonColor,
+                contentColor = contentColor,
+                disabledContainerColor = buttonColor.copy(alpha = 0.6f)
+            ),
+            border = BorderStroke(1.dp, contentColor)
+        ) {
+            if (isLoggingIn) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = loadingColor,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Login", fontSize = 16.sp)
+            }
         }
     }
 }
@@ -189,7 +275,6 @@ fun BiometricWelcomeScreen(
     onAuthenticate: () -> Unit,
     onUseOtherAccount: () -> Unit
 ) {
-    // Usamos el color de fondo oscuro que definimos para el login
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -205,16 +290,13 @@ fun BiometricWelcomeScreen(
                 fontSize = 24.sp
             )
             Text(
-                // Muestra el nombre del usuario
                 text = userName,
-                color = MaterialTheme.colorScheme.primary, // Color de acento
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
-
-        // Sección del sensor biométrico
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 Icons.Filled.Fingerprint,
@@ -222,7 +304,6 @@ fun BiometricWelcomeScreen(
                 tint = Color.White,
                 modifier = Modifier
                     .size(100.dp)
-                    // Al hacer clic, se dispara la solicitud de autenticación
                     .clickable { onAuthenticate() }
             )
             Text(
@@ -232,8 +313,6 @@ fun BiometricWelcomeScreen(
                 fontSize = 16.sp
             )
         }
-
-        // Opción para usar una cuenta diferente
         TextButton(onClick = onUseOtherAccount) {
             Text(
                 "Usar otra cuenta o contraseña",
@@ -246,18 +325,15 @@ fun BiometricWelcomeScreen(
 
 @Composable
 fun CustomTextField(
-    // 💡 SOLUCIÓN 2: La lambda DEBE aceptar el nuevo String escrito
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     isError: Boolean,
     errorMessage: String,
     keyboardOptions: KeyboardOptions,
-    // Opcional: Agregamos parámetros para hacerlo más flexible (ej. Contraseña)
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
-    // Usamos OutlinedTextField, que es común en Material Design
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -276,82 +352,139 @@ fun CustomTextField(
 }
 
 @Composable
-fun AnimatedCountrySelector(selectedCountry: String, onCountrySelected: (String) -> Unit) {
-    val isBrazil = selectedCountry == "País B"
+fun CountrySwitch(
+    currentCountry: Country,
+    onCountryChange: (Country) -> Unit
+) {
+    val argentinaBlue = Color(0xFF74ACDF)
+    val argentinaWhite = Color.White
+    val brazilYellow = Color(0xFFFDE747)
+    val brazilGreen = Color(0xFF009739)
 
-    // 1. Definición de colores
-    val argentinaColor = Color(0xFF74ACDF) // Azul cielo de Argentina
-    val brazilColor = Color(0xFFFDE747)    // Amarillo de Brasil
-
-    // 2. Animación del Color de Fondo
-    val backgroundColor by animateColorAsState(
-        targetValue = if (isBrazil) brazilColor else argentinaColor,
-        animationSpec = tween(durationMillis = 500)
+    val checkedState = currentCountry == Country.COUNTRY_B
+    val animatedTrackColor by animateColorAsState(
+        targetValue = if (checkedState) brazilGreen else argentinaBlue,
+        animationSpec = tween(500)
+    )
+    val animatedThumbColor by animateColorAsState(
+        targetValue = if (checkedState) brazilYellow else argentinaWhite,
+        animationSpec = tween(500)
     )
 
-    // 3. Animación del Color del Texto
-    val contentColor by animateColorAsState(
-        targetValue = if (isBrazil) Color.Black else Color.White,
-        animationSpec = tween(durationMillis = 500)
-    )
-
-    Card(
+    Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .width(280.dp)
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        Text(
+            text = "Argentina",
+            color = if (checkedState) Color.Gray else argentinaBlue
+        )
+
+        Switch(
+            checked = checkedState,
+            onCheckedChange = { isChecked ->
+                val newCountry = if (isChecked) Country.COUNTRY_B else Country.COUNTRY_A
+                onCountryChange(newCountry)
+            },
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = animatedTrackColor,
+                uncheckedTrackColor = animatedTrackColor,
+                checkedThumbColor = animatedThumbColor,
+                uncheckedThumbColor = animatedThumbColor,
+                disabledCheckedThumbColor = Color.Gray,
+                disabledUncheckedThumbColor = Color.LightGray
+            ),
+            modifier = Modifier.size(width = 80.dp, height = 48.dp)
+        )
+
+        Text(
+            text = "Brasil",
+            color = if (checkedState) brazilGreen else Color.Gray
+        )
+    }
+}
+
+@Composable
+fun LoginErrorModal(
+    errorMessage: String,
+    onDismiss: () -> Unit,
+    viewModel: LoginViewModel
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Error de Acceso 🚨")
+        },
+        text = {
+            Text(errorMessage)
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Aceptar")
+            }
+        }
+    )
+}
+
+@Composable
+fun RememberedUserScreen(
+    userName: String,
+    onContinue: () -> Unit,
+    onUseOtherAccount: () -> Unit
+) {
+    val buttonGradient = listOf(Color(0xFF1976D2), Color(0xFF2196F3))
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF192A56))
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceAround
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Bienvenido de nuevo,",
+                color = Color.White,
+                fontSize = 24.sp
+            )
+            Text(
+                text = userName,
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 48.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        Button(
+            onClick = onContinue,
             modifier = Modifier
-                .fillMaxSize()
-                .clickable { /* Abre el diálogo o desplegable */ },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth(0.6f)
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF2196F3)
+            )
         ) {
             Text(
-                text = "Selecciona tu País:",
-                color = contentColor,
-                modifier = Modifier.padding(start = 16.dp)
+                "ENTRAR",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
+        }
 
-            // Usamos un Dropdown para la selección
-            var expanded by remember { mutableStateOf(false) }
-            TextButton(
-                onClick = { expanded = true },
-                modifier = Modifier.padding(end = 8.dp)
-            ) {
-                Text(
-                    text = selectedCountry,
-                    color = contentColor,
-                    fontWeight = FontWeight.Bold
-                )
-                Icon(
-                    Icons.Filled.ArrowDropDown,
-                    contentDescription = "Seleccionar país",
-                    tint = contentColor
-                )
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("País A (Argentina)") },
-                    onClick = {
-                        onCountrySelected("País A")
-                        expanded = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("País B (Brasil)") },
-                    onClick = {
-                        onCountrySelected("País B")
-                        expanded = false
-                    }
-                )
-            }
+        TextButton(onClick = onUseOtherAccount) {
+            Text(
+                "Usar otra cuenta y/o País",
+                color = Color.White.copy(alpha = 0.8f),
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

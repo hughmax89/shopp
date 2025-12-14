@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "792855790294",
+    "project_id": "shopp-ce503",
+    "storage_bucket": "shopp-ce503.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792855790294:android:625a68761f8a17d89cff77",
+        "android_client_info": {
+          "package_name": "com.aguerodev.shopp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX2ChoWeu-smIr1ftxrDrudIhG9gYC2Ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

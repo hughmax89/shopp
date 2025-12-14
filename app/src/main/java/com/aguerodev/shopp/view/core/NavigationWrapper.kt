@@ -20,7 +20,8 @@ import com.aguerodev.shopp.view.splash.SplashScreen
 @Composable
 fun NavigationWrapper(
     modifier: Modifier,
-    onBiometricLogin: ((onSuccess: () -> Unit) -> Unit)
+    onBiometricLogin: ((onSuccess: () -> Unit) -> Unit),
+    isBiometricReady: Boolean
 ) {
     val navController = rememberNavController()
 
@@ -62,20 +63,16 @@ fun NavigationWrapper(
                             }
                         }
                     },
-                    // 2. Pasamos la función de la Activity a la LoginScreen
                     onBiometricLoginRequest = {
-                        // Cuando la LoginScreen pide biometría,
-                        // le indicamos a la Activity cómo navegar si tiene éxito.
                         onBiometricLogin {
                             navController.navigate(BottomBar.Home.route) {
                                 popUpTo(Login) { inclusive = true }
                             }
                         }
-                    }
+                    },
+                    isBiometricAvailable = isBiometricReady
                 )
             }
-
-            // 🔹 Home + pantallas del bottom bar
             composable(BottomBar.Home.route) {
                 HomeScreen()
             }

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -90,9 +91,10 @@ dependencies {
     // DataStore Preferences
     implementation(libs.datastore.preferences)
 
-    // Firebase (BOM)
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.analytics)
 
     // Biometric
     implementation(libs.biometric.ktx)

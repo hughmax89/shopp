@@ -1,6 +1,6 @@
 package com.aguerodev.shopp.domain.entity
 
-enum class User {
-    COUNTRY_A,
-    COUNTRY_B
-}
+data class User (
+    val email: String,
+    val password: String
+)

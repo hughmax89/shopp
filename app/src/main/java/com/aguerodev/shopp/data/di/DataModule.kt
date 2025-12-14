@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.aguerodev.shopp.data.datasource.database.AppDataBase
 import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryA
 import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryB
+import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Singleton
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -87,4 +88,5 @@ object DataModule {
     @Provides
     @Singleton
     fun provideShoppDao(database: AppDataBase) = database.shoppDao()
+
 }

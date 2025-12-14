@@ -40,7 +40,8 @@ class MainActivity : AppCompatActivity() {
                         onBiometricLogin = { onSuccessCallback ->
                             onBiometricSuccess = onSuccessCallback
                             showBiometricAuth()
-                        }
+                        },
+                        isBiometricReady = isBiometricAvailable()
                     )
                 }
             }
@@ -90,5 +91,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Biometría no disponible en este dispositivo.", Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    private fun isBiometricAvailable(): Boolean {
+        val canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+        return canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS
     }
 }
