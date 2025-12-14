@@ -49,7 +49,7 @@ object DataModule {
 //    }
 
 
-//    @CountryAApi
+    @CountryAApi
     @Singleton
     @Provides
     fun provideRetrofitCountryA(json: Json): Retrofit {
@@ -83,7 +83,9 @@ object DataModule {
         context,
         AppDataBase::class.java,
         SHOPP_DB
-    )
+    ).build()
+
+
 
     @Provides
     @Singleton

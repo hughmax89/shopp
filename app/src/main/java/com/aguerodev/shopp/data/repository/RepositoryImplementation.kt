@@ -3,6 +3,7 @@ package com.aguerodev.shopp.data.repository
 import com.aguerodev.shopp.data.datasource.database.AppDataBase
 import com.aguerodev.shopp.data.datasource.database.entities.toDomain
 import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryA
+import com.aguerodev.shopp.data.response.toEntity
 import com.aguerodev.shopp.domain.entity.Product
 import com.aguerodev.shopp.domain.entity.Country
 import com.aguerodev.shopp.domain.entity.User
@@ -19,7 +20,7 @@ class RepositoryImplementation @Inject constructor(
         }
 
     override suspend fun getProductList(countryCountry: Country): List<Product> {
-        val productList = shoppClientCountryA.getProductListCountryA()
+        val productList = shoppClientCountryA.getProductListCountryA().map { it.toEntity() }
 //        val productList = when (userCountry) {
 //            User.COUNTRY_A -> shoppClientCountryA.getProductListCountryA()
 //            User.COUNTRY_B -> shoppClientCountryB.getProductListCountryB()

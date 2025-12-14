@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. Configuración de Biometría
         biometricManager = BiometricManager.from(this)
         setupBiometricPrompt()
 
@@ -34,9 +33,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             ShoppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // 2. Pasamos la función de biometría al NavigationWrapper
                     NavigationWrapper(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier,
                         onBiometricLogin = { onSuccessCallback ->
                             onBiometricSuccess = onSuccessCallback
                             showBiometricAuth()
@@ -61,7 +59,6 @@ class MainActivity : AppCompatActivity() {
                         "Autenticación biométrica exitosa",
                         Toast.LENGTH_SHORT
                     ).show()
-                    // 3. Ejecuta la navegación guardada por la LoginScreen
                     onBiometricSuccess?.invoke()
                 }
 

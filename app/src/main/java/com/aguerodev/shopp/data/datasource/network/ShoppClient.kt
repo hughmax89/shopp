@@ -1,12 +1,12 @@
 package com.aguerodev.shopp.data.datasource.network
 
 import com.aguerodev.shopp.data.datasource.database.entities.ProductEntity
-import com.aguerodev.shopp.domain.entity.Product
+import com.aguerodev.shopp.data.response.ProductResponseCountryA
 import retrofit2.http.GET
 
 interface ShoppClientCountryA {
     @GET("products")
-    suspend fun getProductListCountryA(): List<ProductEntity>
+    suspend fun getProductListCountryA(): List<ProductResponseCountryA>
 }
 
 interface ShoppClientCountryB {

@@ -1,4 +1,4 @@
-package com.aguerodev.shopp.view.util // Asegúrate de que tu paquete sea correcto
+package com.aguerodev.shopp.view.util
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

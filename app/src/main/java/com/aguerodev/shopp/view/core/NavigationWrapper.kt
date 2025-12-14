@@ -11,7 +11,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.aguerodev.shopp.view.detail.DetailProductScreen
+import com.aguerodev.shopp.view.history.HistoryScreen
+import com.aguerodev.shopp.view.history.HistoryViewModel
 import com.aguerodev.shopp.view.home.HomeScreen
+import com.aguerodev.shopp.view.home.HomeViewModel
 import com.aguerodev.shopp.view.login.LoginScreen
 import com.aguerodev.shopp.view.login.LoginViewModel
 import com.aguerodev.shopp.view.splash.SplashScreen
@@ -41,8 +46,6 @@ fun NavigationWrapper(
             startDestination = Splash,
             modifier = modifier.padding(innerPadding)
         ) {
-
-            // 🔹 SplashScreen
             composable<Splash> {
                 SplashScreen(navigateToLogin = {
                     navController.navigate(Login) {
@@ -51,16 +54,13 @@ fun NavigationWrapper(
                 })
             }
 
-            // 🔹 LoginScreen
             composable<Login> {
                 val viewModel = hiltViewModel<LoginViewModel>()
                 LoginScreen(
                     viewModel = viewModel,
                     onLoginSuccess = {
                         navController.navigate(BottomBar.Home.route) {
-                            popUpTo(Login) {
-                                inclusive = true
-                            }
+                            popUpTo(Login) { inclusive = true }
                         }
                     },
                     onBiometricLoginRequest = {
@@ -73,12 +73,35 @@ fun NavigationWrapper(
                     isBiometricAvailable = isBiometricReady
                 )
             }
+
             composable(BottomBar.Home.route) {
-                HomeScreen()
+                val viewModel = hiltViewModel<HomeViewModel>()
+                HomeScreen(
+                    viewModel = viewModel,
+                    navigateToDetail = { productId ->
+                        navController.navigate(Detail(id = productId))
+                    }
+                )
             }
 
             composable(BottomBar.History.route) {
-//                HistoryScreen()
+                // Necesitas crear un HistoryViewModel similar al HomeViewModel
+                // pero que use un UseCase que filtre por productos visitados.
+                val historyViewModel = hiltViewModel<HistoryViewModel>() // Asumimos HistoryViewModel
+                HistoryScreen(
+                    viewModel = historyViewModel,
+                    navigateToDetail = { productId ->
+                        navController.navigate(Detail(id = productId))
+                    }
+                )
+            }
+
+            composable<Detail> { backStackEntry ->
+                val detailRoute = backStackEntry.toRoute<Detail>()
+                DetailProductScreen(
+                    productId = detailRoute.id,
+                    onBack = { navController.popBackStack() }
+                )
             }
 
             composable(BottomBar.Exit.route) {

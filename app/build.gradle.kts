@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.hilt.navigation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.ui.text)
     ksp(libs.hilt.compiler)
 
     //RETROFIT
