@@ -10,5 +10,6 @@ data class Product(
     val imageUrls: List<String>,
     val rating: Double,
     val ratingCount: Int,
-    val visited: Boolean = false
+    val visited: Boolean = false,
+    val sale: Boolean
 )

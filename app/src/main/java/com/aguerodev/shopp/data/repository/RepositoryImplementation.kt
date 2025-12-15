@@ -24,21 +24,23 @@ class RepositoryImplementation @Inject constructor(
         }
 
     override suspend fun getProductList(countryCountry: Country): List<Product> {
-        val productList: List<ProductEntity>
+        var productList = appDataBase.shoppDao().getProducts()
 
-        when (countryCountry) {
-            Country.COUNTRY_A -> {
-                productList = shoppClientCountryA
-                    .getProductListCountryA()
-                    .map { it.toEntity() }
+        if (productList.isEmpty()) {
+            when (countryCountry) {
+                Country.COUNTRY_A -> {
+                    productList = shoppClientCountryA
+                        .getProductListCountryA()
+                        .map { it.toEntity() }
+                }
+                Country.COUNTRY_B -> {
+                    productList = shoppClientCountryB
+                        .getProductListCountryB()
+                        .map { it.toEntity() }
+                }
             }
-            Country.COUNTRY_B -> {
-                productList = shoppClientCountryB
-                    .getProductListCountryB()
-                    .map { it.toEntity() }
-            }
+            appDataBase.shoppDao().insertProducts(productList)
         }
-        appDataBase.shoppDao().insertProducts(productList)
 
         return appDataBase.shoppDao().getProducts().map { it.toDomain() }
     }
@@ -55,4 +57,8 @@ class RepositoryImplementation @Inject constructor(
         override suspend fun deleteHistoryProduct() {
             appDataBase.shoppDao().deleteAllHistoryProducts()
         }
+
+    override suspend fun buyProductUseCase(id: Int) {
+        appDataBase.shoppDao().saleProduct(id)
+    }
 }

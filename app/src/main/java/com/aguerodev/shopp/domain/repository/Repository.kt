@@ -10,4 +10,5 @@ interface Repository{
     suspend fun getHistoryProductList(): List<Product>
     suspend fun updateProductVisit(id: Int)
     suspend fun deleteHistoryProduct()
+    suspend fun buyProductUseCase(id: Int)
 }

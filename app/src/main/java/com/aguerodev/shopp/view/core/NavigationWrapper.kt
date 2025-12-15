@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.aguerodev.shopp.view.detail.DetailProductScreen
+import com.aguerodev.shopp.view.detail.DetailProductScreen // Asegúrate de que DetailProductScreen esté aquí
 import com.aguerodev.shopp.view.history.HistoryScreen
 import com.aguerodev.shopp.view.history.HistoryViewModel
 import com.aguerodev.shopp.view.home.HomeScreen
@@ -100,7 +100,14 @@ fun NavigationWrapper(
                 val detailRoute = backStackEntry.toRoute<Detail>()
                 DetailProductScreen(
                     productId = detailRoute.id,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onPurchaseComplete = {
+                        // Esta es la lógica que se ejecuta después de la compra exitosa.
+                        navController.popBackStack()
+                        navController.navigate(BottomBar.Home.route) {
+                            popUpTo(BottomBar.Home.route) { inclusive = true }
+                        }
+                    }
                 )
             }
 

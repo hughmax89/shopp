@@ -18,7 +18,8 @@ data class ProductEntity(
     val imageUrls: List<String>,
     val rating: Double,
     val ratingCount: Int,
-    val visited: Boolean
+    val visited: Boolean,
+    val sale: Boolean
 )
 
 data class CategoryEntity(
@@ -38,6 +39,7 @@ fun ProductEntity.toDomain(): Product {
         imageUrls = this.imageUrls,
         rating = this.rating,
         ratingCount = this.ratingCount,
-        visited = this.visited
+        visited = this.visited,
+        sale = this.sale
     )
 }

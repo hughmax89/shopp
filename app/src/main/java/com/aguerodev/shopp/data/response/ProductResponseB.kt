@@ -32,6 +32,7 @@ fun ProductResponseB.toEntity(): ProductEntity {
         imageUrls = this.images,
         rating = 0.0,
         ratingCount = 0,
-        visited = false
+        visited = false,
+        sale = false
     )
 }

@@ -12,7 +12,7 @@ interface ShoppDao {
     @Query("SELECT * FROM product_table WHERE id = :id")
     suspend fun getProductById(id: Int): ProductEntity
 
-    @Query("SELECT * FROM product_table")
+    @Query("SELECT * FROM product_table WHERE sale = 0")
     suspend fun getProducts(): List<ProductEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -27,4 +27,6 @@ interface ShoppDao {
     @Query("DELETE FROM product_table")
     suspend fun deleteAllHistoryProducts()
 
+    @Query("UPDATE product_table SET sale = 1 WHERE id = :id")
+    suspend fun saleProduct(id: Int)
 }

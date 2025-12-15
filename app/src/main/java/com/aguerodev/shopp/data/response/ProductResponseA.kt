@@ -32,6 +32,7 @@ fun ProductResponseA.toEntity(): ProductEntity {
         imageUrls = listOf(this.image),
         rating = this.rating.rate,
         ratingCount = this.rating.count,
-        visited = false
+        visited = false,
+        sale = false
     )
 }

@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,10 +26,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-// Importaciones de corrutinas (delay, launch, rememberCoroutineScope) ELIMINADAS
-
 import com.aguerodev.shopp.domain.entity.Country
 import com.aguerodev.shopp.domain.entity.Product
 import com.aguerodev.shopp.view.core.Resource
@@ -166,6 +167,35 @@ fun ProductListItem(product: Product, onClick: () -> Unit) {
                         error = starPainter
                     )
                 }
+                if (product.visited) {
+                    Card(
+                        modifier = Modifier
+                            .align(Alignment.TopStart),
+                        shape = RoundedCornerShape(bottomEnd = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Filled.Visibility,
+                                contentDescription = "Visto",
+                                tint = Color.White,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "VISTO",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -217,21 +247,6 @@ fun ProductListItem(product: Product, onClick: () -> Unit) {
                             color = Color.Black
                         )
                     }
-                }
-
-                if (product.visited) {
-                    Text(
-                        text = "VISTO",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .background(
-                                Color.LightGray.copy(alpha = 0.3f),
-                                MaterialTheme.shapes.extraSmall
-                            )
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
                 }
             }
         }
