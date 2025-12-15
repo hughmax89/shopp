@@ -12,9 +12,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.aguerodev.shopp.view.detail.DetailProductScreen // Asegúrate de que DetailProductScreen esté aquí
-import com.aguerodev.shopp.view.history.HistoryScreen
-import com.aguerodev.shopp.view.history.HistoryViewModel
+import com.aguerodev.shopp.view.detail.DetailProductScreen
+import com.aguerodev.shopp.view.shopping.HistoryScreen
+import com.aguerodev.shopp.view.shopping.HistoryViewModel
 import com.aguerodev.shopp.view.home.HomeScreen
 import com.aguerodev.shopp.view.home.HomeViewModel
 import com.aguerodev.shopp.view.login.LoginScreen
@@ -85,14 +85,9 @@ fun NavigationWrapper(
             }
 
             composable(BottomBar.History.route) {
-                // Necesitas crear un HistoryViewModel similar al HomeViewModel
-                // pero que use un UseCase que filtre por productos visitados.
-                val historyViewModel = hiltViewModel<HistoryViewModel>() // Asumimos HistoryViewModel
+                val historyViewModel = hiltViewModel<HistoryViewModel>()
                 HistoryScreen(
-                    viewModel = historyViewModel,
-                    navigateToDetail = { productId ->
-                        navController.navigate(Detail(id = productId))
-                    }
+                    viewModel = historyViewModel
                 )
             }
 
@@ -102,7 +97,6 @@ fun NavigationWrapper(
                     productId = detailRoute.id,
                     onBack = { navController.popBackStack() },
                     onPurchaseComplete = {
-                        // Esta es la lógica que se ejecuta después de la compra exitosa.
                         navController.popBackStack()
                         navController.navigate(BottomBar.Home.route) {
                             popUpTo(BottomBar.Home.route) { inclusive = true }

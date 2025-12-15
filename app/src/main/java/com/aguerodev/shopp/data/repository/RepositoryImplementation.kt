@@ -19,9 +19,9 @@ class RepositoryImplementation @Inject constructor(
     @DataModule.CountryBApi private val shoppClientCountryB: ShoppClientCountryB,
     private val appDataBase: AppDataBase
 ) : Repository {
-        override suspend fun getProduct(id: Int): Product {
-            return appDataBase.shoppDao().getProductById(id).toDomain()
-        }
+    override suspend fun getProduct(id: Int): Product {
+        return appDataBase.shoppDao().getProductById(id).toDomain()
+    }
 
     override suspend fun getProductList(countryCountry: Country): List<Product> {
         var productList = appDataBase.shoppDao().getProducts()
@@ -33,6 +33,7 @@ class RepositoryImplementation @Inject constructor(
                         .getProductListCountryA()
                         .map { it.toEntity() }
                 }
+
                 Country.COUNTRY_B -> {
                     productList = shoppClientCountryB
                         .getProductListCountryB()
@@ -47,16 +48,16 @@ class RepositoryImplementation @Inject constructor(
 
 
     override suspend fun getHistoryProductList(): List<Product> {
-            return appDataBase.shoppDao().getAllHistoryProducts().map { it.toDomain() }
-        }
+        return appDataBase.shoppDao().getAllHistoryProducts().map { it.toDomain() }
+    }
 
-        override suspend fun updateProductVisit(id: Int) {
-            appDataBase.shoppDao().updateProductVisited(id)
-        }
+    override suspend fun updateProductVisit(id: Int) {
+        appDataBase.shoppDao().updateProductVisited(id)
+    }
 
-        override suspend fun deleteHistoryProduct() {
-            appDataBase.shoppDao().deleteAllHistoryProducts()
-        }
+    override suspend fun deleteHistoryProduct() {
+        appDataBase.shoppDao().deleteAllHistoryProducts()
+    }
 
     override suspend fun buyProductUseCase(id: Int) {
         appDataBase.shoppDao().saleProduct(id)
