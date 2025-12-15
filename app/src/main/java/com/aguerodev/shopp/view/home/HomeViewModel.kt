@@ -70,8 +70,6 @@ class HomeViewModel @Inject constructor(
     fun onProductClicked(product: Product, navigateToDetail: (Int) -> Unit) {
         isNavigating = true
         viewModelScope.launch {
-            // Simular un pequeño delay de carga/navegación
-            delay(500)
             navigateToDetail(product.id)
             isNavigating = false
         }

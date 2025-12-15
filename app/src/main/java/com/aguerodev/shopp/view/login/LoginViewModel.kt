@@ -91,8 +91,27 @@ class LoginViewModel @Inject constructor(
     fun clearValidationError() {
         _validationError.value = null
     }
+
+    fun clearRememberedUser() {
+        viewModelScope.launch {
+            dataStoreManager.clearAllPreferences()
+
+            isUserRemembered = false
+            rememberedUserName = null
+            rememberMe = false
+            _email.value = ""
+            _password.value = ""
+            _selectedCountry.value = Country.COUNTRY_A
+        }
+    }
+
     fun loginFirebase() {
         clearValidationError()
+        if (!_email.value.contains("@") || _password.value.length < 8) {
+            _validationError.value = "Por favor, ingrese un email válido y una contraseña de al menos 8 caracteres."
+            _loginState.value = Resource.Idle()
+            return
+        }
 
         _loginState.value = Resource.Loading()
         val user = User(_email.value, _password.value)

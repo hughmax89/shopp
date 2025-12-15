@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,18 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalConfiguration
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val ANIMATION_DURATION_MS = 1000
-private val ICON_SIZE = 120.dp
+private val ICON_SIZE = 150.dp
 
 @Preview
 @Composable
@@ -53,7 +50,7 @@ fun SplashScreen(navigateToLogin: () -> Unit) {
     LaunchedEffect(Unit) {
         val animationJob = launch {
             animationProgress.animateTo(
-                targetValue = 1f,
+                targetValue = 0.8f,
                 animationSpec = tween(
                     durationMillis = ANIMATION_DURATION_MS,
                     easing = LinearEasing
@@ -98,19 +95,5 @@ fun SplashScreen(navigateToLogin: () -> Unit) {
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
-    }
-}
-
-
-@Composable
-fun LoginScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Pantalla de Login", style = MaterialTheme.typography.headlineLarge)
     }
 }

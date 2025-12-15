@@ -18,7 +18,7 @@ interface ShoppDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProducts(products: List<ProductEntity>)
 
-    @Query("SELECT * FROM product_table WHERE visited = 1")
+    @Query("SELECT * FROM product_table WHERE sale = 1")
     suspend fun getAllHistoryProducts(): List<ProductEntity>
 
     @Query("UPDATE product_table SET visited = 1 WHERE id = :id")

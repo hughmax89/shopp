@@ -72,6 +72,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        viewModel.refreshProducts()
     }
 
     Scaffold(

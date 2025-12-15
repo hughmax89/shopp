@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -31,10 +32,10 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -81,8 +82,10 @@ fun LoginScreen(
     val validationErrorMessage by viewModel.validationError.collectAsState()
     val isLoggingIn = loginState is Resource.Loading
     val keyboardController = LocalSoftwareKeyboardController.current
+
     val argentinaBlue = Color(0xFF74ACDF)
     val brazilYellow = Color(0xFFFDE747)
+    val brazilGreen = Color(0xFF009739)
     val isBrazil = selectedCountryValue == Country.COUNTRY_B
 
     val buttonColor by animateColorAsState(
@@ -90,8 +93,13 @@ fun LoginScreen(
         animationSpec = tween(500), label = "ButtonColor"
     )
 
+    val primaryCountryColor by animateColorAsState(
+        targetValue = if (isBrazil) brazilGreen else argentinaBlue,
+        animationSpec = tween(500), label = "CountryPrimaryColor"
+    )
+
     val contentColor = if (isBrazil) Color.Black else Color.White
-    val loadingColor = contentColor
+    val loadingColor = Color.White
 
     LaunchedEffect(Unit) {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -120,8 +128,9 @@ fun LoginScreen(
         if (isBiometricAvailable) {
             BiometricWelcomeScreen(
                 userName = viewModel.rememberedUserName ?: "Usuario",
+                primaryCountryColor = primaryCountryColor,
                 onAuthenticate = { onBiometricLoginRequest() },
-                onUseOtherAccount = { viewModel.isUserRemembered = false }
+                onUseOtherAccount = { viewModel.clearRememberedUser() }
             )
         } else {
             RememberedUserScreen(
@@ -129,10 +138,9 @@ fun LoginScreen(
                 onContinue = {
                     onLoginSuccess()
                 },
-                onUseOtherAccount = { viewModel.isUserRemembered = false }
+                onUseOtherAccount = { viewModel.clearRememberedUser() }
             )
         }
-        // Si se muestra cualquiera de las pantallas recordadas, salimos del Composable
         return
     }
 
@@ -155,19 +163,10 @@ fun LoginScreen(
         )
     }
 
-    if (viewModel.isUserRemembered) {
-        BiometricWelcomeScreen(
-            userName = viewModel.rememberedUserName ?: "Usuario",
-            onAuthenticate = { onBiometricLoginRequest() },
-            onUseOtherAccount = { viewModel.isUserRemembered = false }
-        )
-        return
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF192A56))
+            .background(Color.Black)
             .padding(24.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -177,7 +176,16 @@ fun LoginScreen(
             color = Color.White,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 48.dp, bottom = 32.dp)
+            modifier = Modifier.padding(top = 48.dp)
+        )
+
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = "Icono de carrito de compras",
+            tint = primaryCountryColor,
+            modifier = Modifier
+                .padding(bottom = 32.dp, top = 8.dp)
+                .size(48.dp)
         )
 
         CustomTextField(
@@ -207,11 +215,12 @@ fun LoginScreen(
                 val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = description)
+                    Icon(imageVector = image, contentDescription = description, tint = Color.White)
                 }
             }
         )
         Spacer(Modifier.height(24.dp))
+
         CountrySwitch(
             currentCountry = selectedCountryValue,
             onCountryChange = viewModel::onCountrySelectionChanged
@@ -241,7 +250,6 @@ fun LoginScreen(
         OutlinedButton(
             onClick = {
                 keyboardController?.hide()
-                // Inicia la operación de Login, que setea isLoggingIn = true (Resource.Loading)
                 viewModel.loginFirebase()
             },
             enabled = !isLoggingIn,
@@ -269,9 +277,11 @@ fun LoginScreen(
     }
 }
 
+
 @Composable
 fun BiometricWelcomeScreen(
     userName: String,
+    primaryCountryColor: Color, // 💡 Nuevo parámetro
     onAuthenticate: () -> Unit,
     onUseOtherAccount: () -> Unit
 ) {
@@ -291,7 +301,7 @@ fun BiometricWelcomeScreen(
             )
             Text(
                 text = userName,
-                color = MaterialTheme.colorScheme.primary,
+                color = primaryCountryColor, // 💡 Nombre con color del país
                 fontSize = 48.sp,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(top = 8.dp)
@@ -316,7 +326,7 @@ fun BiometricWelcomeScreen(
         TextButton(onClick = onUseOtherAccount) {
             Text(
                 "Usar otra cuenta o contraseña",
-                color = Color.White,
+                color = primaryCountryColor, // 💡 Botón con color del país
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -337,17 +347,24 @@ fun CustomTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { Text(label, color = Color.Gray) },
         isError = isError,
         supportingText = if (isError) {
-            { Text(errorMessage) }
+            { Text(errorMessage, color = MaterialTheme.colorScheme.error) }
         } else {
             null
         },
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.Gray,
+            cursorColor = Color.White
+        )
     )
 }
 
@@ -364,11 +381,11 @@ fun CountrySwitch(
     val checkedState = currentCountry == Country.COUNTRY_B
     val animatedTrackColor by animateColorAsState(
         targetValue = if (checkedState) brazilGreen else argentinaBlue,
-        animationSpec = tween(500)
+        animationSpec = tween(500), label = "TrackColor"
     )
     val animatedThumbColor by animateColorAsState(
         targetValue = if (checkedState) brazilYellow else argentinaWhite,
-        animationSpec = tween(500)
+        animationSpec = tween(500), label = "ThumbColor"
     )
 
     Row(
@@ -419,7 +436,7 @@ fun LoginErrorModal(
             Text("Error de Acceso 🚨")
         },
         text = {
-            Text(errorMessage)
+            Text(errorMessage, color = Color.Black)
         },
         confirmButton = {
             Button(
@@ -437,12 +454,10 @@ fun RememberedUserScreen(
     onContinue: () -> Unit,
     onUseOtherAccount: () -> Unit
 ) {
-    val buttonGradient = listOf(Color(0xFF1976D2), Color(0xFF2196F3))
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF192A56))
+            .background(Color.Black)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
@@ -455,7 +470,7 @@ fun RememberedUserScreen(
             )
             Text(
                 text = userName,
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.White,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(top = 8.dp)
@@ -468,12 +483,12 @@ fun RememberedUserScreen(
                 .fillMaxWidth(0.6f)
                 .height(50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2196F3)
+                containerColor = Color.White,
             )
         ) {
             Text(
                 "ENTRAR",
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
