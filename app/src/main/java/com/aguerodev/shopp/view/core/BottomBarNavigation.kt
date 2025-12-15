@@ -1,6 +1,7 @@
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,16 +10,20 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.aguerodev.shopp.view.core.CountryColorScheme
 import com.aguerodev.shopp.view.core.bottomDestinations
 
 @Composable
 fun BottomBarNavigation(
-    navController: NavHostController
+    navController: NavHostController,
+    colorScheme: CountryColorScheme
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = colorScheme.primaryColor
+    ) {
         bottomDestinations.forEach { item ->
             val selected = currentDestination.isRouteInHierarchy(item.route)
 
@@ -40,8 +45,16 @@ fun BottomBarNavigation(
                     )
                 },
                 label = {
+                    // 💡 Aplicar el color de texto del país
                     Text(text = item.title)
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = colorScheme.onPrimaryColor,
+                    unselectedIconColor = colorScheme.onPrimaryColor.copy(alpha = 0.7f),
+                    indicatorColor = colorScheme.onPrimaryColor.copy(alpha = 0.2f),
+                    selectedTextColor = colorScheme.onPrimaryColor,
+                    unselectedTextColor = colorScheme.onPrimaryColor.copy(alpha = 0.7f),
+                )
             )
         }
     }

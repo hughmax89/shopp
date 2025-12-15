@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -57,7 +58,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.core.splashscreen)
 
     //NAV
     implementation(libs.androidx.navigation.compose)
@@ -65,6 +67,10 @@ dependencies {
     //HILT
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.compose.foundation)
     ksp(libs.hilt.compiler)
 
     //RETROFIT
@@ -85,4 +91,20 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    // DataStore Preferences
+    implementation(libs.datastore.preferences)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.analytics)
+
+    // Biometric
+    implementation(libs.biometric.ktx)
+
+    //COIL
+    implementation(libs.coil.compose)
+
+    // Gson (JSON)
+    implementation(libs.google.gson)
 }

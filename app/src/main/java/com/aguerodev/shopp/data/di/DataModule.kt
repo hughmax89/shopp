@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.aguerodev.shopp.data.datasource.database.AppDataBase
 import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryA
 import com.aguerodev.shopp.data.datasource.network.ShoppClientCountryB
+import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Singleton
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -25,11 +26,11 @@ object DataModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class CountryAApi
 
-//    @Qualifier
-//    @Retention(AnnotationRetention.BINARY)
-//    annotation class CountryBApi
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class CountryBApi
 
-//    @CountryAApi
+    @CountryAApi
     @Singleton
     @Provides
     fun provideShoppClientCountryA(
@@ -38,17 +39,7 @@ object DataModule {
         return retrofit.create(ShoppClientCountryA::class.java)
     }
 
-//    @CountryBApi
-//    @Singleton
-//    @Provides
-//    fun provideShoppClientCountryB(
-//        @CountryBApi retrofit: Retrofit
-//    ): ShoppClientCountryB {
-//        return retrofit.create(ShoppClientCountryB::class.java)
-//    }
-
-
-//    @CountryAApi
+    @CountryAApi
     @Singleton
     @Provides
     fun provideRetrofitCountryA(json: Json): Retrofit {
@@ -57,16 +48,25 @@ object DataModule {
             .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
             .build()
     }
-//    @CountryBApi
-//    @Singleton
-//    @Provides
-//    fun provideRetrofitCountryB(json: Json): Retrofit {
-//        return Retrofit.Builder()
-//            .baseUrl("https://fakeapi.platzi.com/")
-//            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
-//            .build()
-//    }
 
+    @CountryBApi
+    @Singleton
+    @Provides
+    fun provideShoppClientCountryB(
+        @CountryBApi retrofit: Retrofit
+    ): ShoppClientCountryB {
+        return retrofit.create(ShoppClientCountryB::class.java)
+    }
+
+    @CountryBApi
+    @Singleton
+    @Provides
+    fun provideRetrofitCountryB(json: Json): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.escuelajs.co/")
+            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
+            .build()
+    }
 
     @Provides
     fun provideJson(): Json{
@@ -82,9 +82,10 @@ object DataModule {
         context,
         AppDataBase::class.java,
         SHOPP_DB
-    )
+    ).build()
 
     @Provides
     @Singleton
     fun provideShoppDao(database: AppDataBase) = database.shoppDao()
+
 }
