@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.aguerodev.shopp.view.core.NavigationWrapper
 import com.aguerodev.shopp.view.ui.theme.ShoppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,9 +24,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var biometricPrompt: BiometricPrompt
     private var onBiometricSuccess: (() -> Unit)? = null
 
+    private var isReady = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isReady }
+        isReady = true
         biometricManager = BiometricManager.from(this)
         setupBiometricPrompt()
 

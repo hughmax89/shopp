@@ -29,6 +29,7 @@ uiText = "1.10.0"
 coil = "2.6.0"
 gson = "2.10.1"
 foundation = "1.10.0"
+coreSplashscreen = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -72,6 +73,7 @@ androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", ve
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -29,6 +29,7 @@ fun NavigationWrapper(
     isBiometricReady: Boolean
 ) {
     val navController = rememberNavController()
+    val colorScheme = getAestheticColorScheme()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -37,7 +38,10 @@ fun NavigationWrapper(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                BottomBarNavigation(navController = navController)
+                BottomBarNavigation(
+                    navController = navController,
+                    colorScheme = colorScheme
+                )
             }
         }
     ) { innerPadding ->
@@ -46,6 +50,7 @@ fun NavigationWrapper(
             startDestination = Splash,
             modifier = modifier.padding(innerPadding)
         ) {
+
             composable<Splash> {
                 SplashScreen(navigateToLogin = {
                     navController.navigate(Login) {
@@ -84,7 +89,7 @@ fun NavigationWrapper(
                 )
             }
 
-            composable(BottomBar.History.route) {
+            composable(BottomBar.Shopping.route) {
                 val historyViewModel = hiltViewModel<HistoryViewModel>()
                 HistoryScreen(
                     viewModel = historyViewModel
