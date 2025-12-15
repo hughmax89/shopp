@@ -25,7 +25,7 @@ interface ShoppDao {
     suspend fun updateProductVisited(id: Int)
 
     @Query("DELETE FROM product_table")
-    suspend fun deleteAllHistoryProducts()
+    suspend fun deleteHistoryProduct()
 
     @Query("UPDATE product_table SET sale = 1 WHERE id = :id")
     suspend fun saleProduct(id: Int)

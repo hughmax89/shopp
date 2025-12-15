@@ -27,6 +27,12 @@ class DataStoreManager @Inject constructor(
         }
     }
 
+    suspend fun clearAllPreferences() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
+
     val userPreferencesFlow: Flow<Triple<String?, Boolean, Country?>> = dataStore.data
         .map { preferences ->
             val email = preferences[USER_EMAIL_KEY]

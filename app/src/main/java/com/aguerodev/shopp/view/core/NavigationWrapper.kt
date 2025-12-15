@@ -20,7 +20,7 @@ import com.aguerodev.shopp.view.home.HomeViewModel
 import com.aguerodev.shopp.view.login.LoginScreen
 import com.aguerodev.shopp.view.login.LoginViewModel
 import com.aguerodev.shopp.view.splash.SplashScreen
-
+import com.aguerodev.shopp.view.shopping.ExitScreen
 
 @Composable
 fun NavigationWrapper(
@@ -106,9 +106,7 @@ fun NavigationWrapper(
             }
 
             composable(BottomBar.Exit.route) {
-                navController.navigate(Login) {
-                    popUpTo(0) { inclusive = true }
-                }
+                ExitScreen(navController = navController)
             }
         }
     }

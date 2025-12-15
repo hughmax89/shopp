@@ -56,7 +56,7 @@ class RepositoryImplementation @Inject constructor(
     }
 
     override suspend fun deleteHistoryProduct() {
-        appDataBase.shoppDao().deleteAllHistoryProducts()
+        appDataBase.shoppDao().deleteHistoryProduct()
     }
 
     override suspend fun buyProductUseCase(id: Int) {
