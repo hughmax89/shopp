@@ -13,6 +13,7 @@ Retrofit -> API
 Authentication -> Firebase
 GITHUB -> Respository
 Coil -> Image loader
+MockK -> Unit testing
 
 
 
